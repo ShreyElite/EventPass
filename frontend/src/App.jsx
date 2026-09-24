@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 
 function App() {
@@ -14,6 +14,26 @@ function App() {
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
 
+  useEffect(() => {
+    const loadEvents = async () => {
+      try {
+        const response = await fetch("/api/events");
+        if (!response.ok) {
+          throw new Error("Unable to load events");
+        }
+
+        const events = await response.json();
+        if (events.length > 0) {
+          setEvent(events[events.length - 1]);
+        }
+      } catch {
+        showMessage("Unable to connect to the EventPass backend.", "error");
+      }
+    };
+
+    loadEvents();
+  }, []);
+
   const showMessage = (text, type = "success") => {
     setMessage(text);
     setMessageType(type);
@@ -25,7 +45,7 @@ function App() {
       return;
     }
 
-    const response = await fetch("http://localhost:5000/api/events", {
+    const response = await fetch("/api/events", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -57,7 +77,7 @@ function App() {
       return;
     }
 
-    const response = await fetch("http://localhost:5000/api/register", {
+    const response = await fetch("/api/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -92,7 +112,7 @@ function App() {
       return;
     }
 
-    const response = await fetch("http://localhost:5000/api/checkin", {
+    const response = await fetch("/api/checkin", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
